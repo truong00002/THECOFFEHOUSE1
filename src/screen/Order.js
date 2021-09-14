@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   View,
   Text,
@@ -12,74 +12,45 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
 import Fontisto from 'react-native-vector-icons/Fontisto';
+import { getMenu } from '../sevices/api';
 
 
-
-const Data = [
-  {
-    id: '1',
-    titleHeading: 'Combo 6 lon cafe sữa đá',
-    title: 'Ưu đãi 10% cho đơn hàng mua Cà phê gói - Cà phê uống liền...',
-    image: 'https://product.hstatic.net/1000075078/product/lon-park6_9fb70fb05cc44ddabf13ff115bab1ce6_large.jpg',
-    price: '336.000'
-  },
-  {
-    id: '2',
-    titleHeading: 'Cafe sữa hòa tan',
-    title: 'Ưu đãi 10% cho đơn hàng mua Cà phê gói - Cà phê uống liền...',
-    image: 'https://product.hstatic.net/1000075078/product/caphesuada_ba1ebc3227b34e97b5bb1e711cb3676f_large.jpg',
-    price: '422.000'
-  },
-  {
-    id: '3',
-    titleHeading: 'Cafe peak flavor -  hương thơm đỉnh cao',
-    title: 'Ưu đãi 10% cho đơn hàng mua Cà phê gói - Cà phê uống liền...',
-    image: 'https://product.hstatic.net/1000075078/product/peak_196fc2433ab14ef297113696e4d6c179_large.jpg',
-    price: '522.000'
-  },
-  {
-    id: '4',
-    titleHeading: 'Cafe rich finish - Gu đậm tinh tế',
-    title: 'Ưu đãi 10% cho đơn hàng mua Cà phê gói - Cà phê uống liền...',
-    image: 'https://product.hstatic.net/1000075078/product/rich_327845e1f8374e21955320e3ea8e7263_large.jpg',
-    price: '192.000'
-  },
-  {
-    id: '5',
-    titleHeading: 'Americano',
-    title: 'Ưu đãi 10% cho đơn hàng mua Cà phê gói - Cà phê uống liền...',
-    image: 'https://product.hstatic.net/1000075078/product/americano-da_7495646eaad24b8cbe0e68e8e479f01f_large.jpg',
-    price: '200.000'
-  },
-  {
-    id: '6',
-    titleHeading: 'Combo 6 lon cafe sữa đá',
-    title: 'Ưu đãi 10% cho đơn hàng mua Cà phê gói - Cà phê uống liền...',
-    image: 'https://product.hstatic.net/1000075078/product/lon-park6_9fb70fb05cc44ddabf13ff115bab1ce6_large.jpg',
-    price: '312.000'
-  },
-];
-
-
-const RenderItem = ({ item }) => {
-  return (
-    <View style={styles.item}>
-      <TouchableOpacity style={{ flexDirection: 'row', margin: 15, justifyContent: 'space-between' }}>
-        <View style={styles.content}>
-          <Text style={styles.textHeading}>{item.titleHeading}</Text>
-          <Text style={styles.textTitle}>{item.title}</Text>
-          <Text style={styles.textPrice}>{item.price}</Text>
-        </View>
-        <Image
-          source={{ uri: item.image }}
-          style={styles.image}
-        />
-      </TouchableOpacity>
-    </View>
-  )
-}
 export default function Order() {
+  const [product, setProduct] = useState([]);
   const windowHeight = Dimensions.get('window').height;
+
+  useEffect(() => {
+    const callGetMenu = async () => {
+      try {
+        const response = await getMenu();
+        console.log('rs', response.data.data); // data tu api tra ve
+        setProduct(response.data.data)
+
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    callGetMenu()
+  }, [])
+
+  const RenderItem = ({ item }) => {
+    return (
+      <View style={styles.item}>
+        <TouchableOpacity style={{ flexDirection: 'row', margin: 15, justifyContent: 'space-between' }}>
+          <View style={styles.content}>
+            <Text style={styles.textHeading}>{item.product_name}</Text>
+            <Text style={styles.textTitle} ellipsizeMode='tail' numberOfLines={3}>{item.description}</Text>
+            <Text style={styles.textPrice}>{item.base_price} vnd</Text>
+          </View>
+          <Image
+            source={{ uri: item.image }}
+            style={styles.image}
+          />
+        </TouchableOpacity>
+      </View>
+    )
+  }
 
   const titleListItem = () => {
     return (
@@ -116,7 +87,7 @@ export default function Order() {
         <Ionicons name='heart-outline' size={20} color='#555' style={styles.icon} />
       </View>
       <FlatList
-        data={Data}
+        data={product}
         renderItem={RenderItem}
         keyExtractor={item => item.id}
         style={{ marginBottom: 0 }}

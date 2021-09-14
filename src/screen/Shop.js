@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, Text, SafeAreaView, StyleSheet, Image, TouchableOpacity, FlatList, TextInput, Dimensions } from 'react-native'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Fontisto from 'react-native-vector-icons/Fontisto'
+import { getShop } from '../sevices/api';
 
 const DataMap = [
   {
@@ -77,26 +78,44 @@ const DataMap = [
   },
 ];
 
-const renderItem1 = ({ item }) => {
-  return (
-    <View style={styles.item}>
-      <TouchableOpacity style={styles.item_row}>
-        <Image
-          source={{ uri: item.image }}
-          style={styles.image}
-        />
-        <View style={styles.textcontent}>
-          <Text style={styles.text1}>{item.title}</Text>
-          <Text style={styles.text2}>{item.address}</Text>
-          <Text style={styles.text3}>{item.khoangcach}</Text>
-        </View>
-      </TouchableOpacity>
-    </View>
-  )
-}
 export default function shop() {
-
   const windowHeight = Dimensions.get('window').height;
+  const [shop, setShop] = useState([]);
+
+  useEffect(() => {
+    const callGetShop = async () => {
+      try {
+        const response = await getShop();
+        console.log('rs', response.data.data); // data tu api tra ve
+        setShop(response.data)
+
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    callGetShop()
+  }, [])
+
+
+  const renderItem1 = ({ item }) => {
+    return (
+      <View style={styles.item}>
+        <TouchableOpacity style={styles.item_row}>
+          <Image
+            source={{ uri: item.image_1 }}
+            style={styles.image}
+          />
+          <View style={styles.textcontent}>
+            <Text style={styles.text1}>{item.name}</Text>
+            <Text style={styles.text2}>{item.address.full_address}</Text>
+            <Text style={styles.text3}></Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+    )
+  }
+
   return (
     <SafeAreaView style={{ height: windowHeight - 50 }}>
       <View style={styles.Header}>
@@ -164,7 +183,7 @@ export default function shop() {
         <Text style={{ fontSize: 20, fontWeight: 'bold', margin: 15 }}>Cửa hàng gần đây</Text>
       </View>
       <FlatList
-        data={DataMap}
+        data={shop}
         renderItem={renderItem1}
         keyExtractor={item => item.id}
         style={{ marginBottom: 0 }}
